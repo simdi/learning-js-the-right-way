@@ -3,7 +3,7 @@
 This is a project about learning JavaScript the right way.
 Playing around with new JavaScript techniques such as:
 
-Generators
+# Generators,
 Promises
 Observables
 Communication Sequential Processes (CSP)
