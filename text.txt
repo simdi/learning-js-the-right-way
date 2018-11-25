@@ -1,0 +1,3 @@
+Hello World
+I love programming
+Do as I say
