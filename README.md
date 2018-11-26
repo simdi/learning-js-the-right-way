@@ -7,3 +7,4 @@ Playing around with new JavaScript techniques such as:
 # Promises
 # Observables
 # Communication Sequential Processes (CSP)
+# Socket
