@@ -16,7 +16,12 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div>
-            <h5>Hello World</h5>
+            <h5>Hello World Chat Application</h5>
+            <div>
+                <input type="text" id="input">
+                <button id="sendIt">Send it</button>
+            </div>
+            <div id="message"></div>
         </div>
         
         <script src="/socket.io/socket.io.js"></script>
@@ -26,11 +31,21 @@
             socket.on('connect', _=> {
                 console.log('Connected');
             });
-            socket.on('message', (data) => {
-                console.log('data', data);
+            socket.on('message', (msg) => {
+                console.log('msg', msg);
+                document.getElementById('message').innerHTML += msg;
             });
             socket.on('disconnect', _=> {
                 console.log('Disconnected');
+            });
+
+            document.getElementById('sendIt').addEventListener('click', _ => {
+                console.log('clicked');
+                const msg = document.getElementById('input').value;
+                if (msg) {
+                    socket.emit('typeit', msg);
+                    document.getElementById('message').innerHTML += msg;
+                }
             });
         </script>
     </body>

@@ -24,13 +24,12 @@ function httpHandler(req, res) {
 function socketHandler(socket) {
     console.log('Socket Connected');
     function disconnet() {
-        clearTimeout(intv);
         console.log('Client disconnected');
     }
 
-    const intv = setInterval(() => {
-        socket.emit('message', Math.random());
-    }, 1000);
+    socket.on('typeit', (data) => {
+        socket.broadcast.emit('message', data);
+    });
     socket.on('disconnect', disconnet);
 }
 
