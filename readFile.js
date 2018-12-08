@@ -11,5 +11,5 @@ if (args.help || !args.name || !args.file) {
 Helper.readFileAsync(args.file, (err, content) => {
     if(err) console.log('Err', err);
     else 
-    console.log(content.toString());
+    return content.toString();
 });
