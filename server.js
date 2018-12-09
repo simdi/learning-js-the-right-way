@@ -23,28 +23,78 @@ function httpHandler(req, res) {
     } else if (parsedUrl.href === '/read-excel-file') {
         // Read excel file
         const buf = fs.readFileSync('./States, Local Gorvernment Areas, Wards in Nigeria copy.xlsx');
-        console.log('Buf', buf.toString());
         const wb = XLSX.read(buf, {type:'buffer'});
-        console.log('wb', wb);
-        console.log('Strings', JSON.stringify(wb.Strings));
-        // const toJson = XLSX.utils.sheet_to_json(wb);
-        
-        // console.log('ToJson', toJson);
 
-        // fs.appendFile("./data/ward_and_local_governments_in_Nigeria1.json", JSON.stringify(wb.Strings), (err) => {
+        fs.appendFile("./data/ward_and_local_governments_in_Nigeria1.json", JSON.stringify(wb.Strings), (err) => {
+            if(err) return console.log(err);
+            console.log("The file was saved!");
+        });
+    } else if (parsedUrl.href === '/read-json-file') {
+        const file = require('./States, Local Gorvenment Areas, Wards In Nigeria copy.js');
+
+        console.log('file', file);
+        const state = file.reduce((a,b) => {
+            let state = (b['STATE NAME'] !== '') ? {} : { name: b['STATE NAME'], code: b['STATE CODE'].toString(), lgas: []};
+            if (b['STATE NAME'] !== '') {
+                let lga = {};
+                let ward = {};
+                state.name = b['STATE NAME'];
+                state.code = b['STATE CODE'].toString();
+                state.lgas = [];
+                lga.name = b["LGA NAME"];
+                lga.code = b["LGA CODE"].toString();
+                lga.wards = [];
+                ward.name = b["WARD NAME"];
+                ward.code = b["WARD CODE"].toString();
+                lga.wards.push(ward);
+                state.lgas.push(lga);
+                a.push(state);
+            } else {
+                const lastState = a[a.length-1];
+                if (b['LGA NAME'] !== '') {
+                    let lga = {};
+                    let ward = {};
+                    lga.name = b["LGA NAME"];
+                    lga.code = b["LGA CODE"].toString();
+                    lga.wards = [];
+                    ward.name = b["WARD NAME"];
+                    ward.code = b["WARD CODE"].toString();
+                    lga.wards.push(ward);
+                    lastState.lgas.push(lga);
+                } else {
+                    let ward = {};
+                    ward.name = b["WARD NAME"];
+                    ward.code = b["WARD CODE"].toString();
+                    lastState.lgas[lastState.lgas.length-1].wards.push(ward);
+                }
+            }
+            
+            return a;
+        }, []);
+
+        console.log(state);
+        fs.appendFile("./data/ward_and_local_governments_in_Nigeria.json", JSON.stringify(state), (err) => {
+            if(err) return console.log(err);
+            console.log("The file was saved!");
+        });
+    } else if (parsedUrl.href === '/add-extra-data') {
+        const file = require('./ward_and_local_governments_in_Nigeria.js');
+
+        console.log('File',file);
+        const states = file.map(x => {
+            x.noOfLga = x.lgas.length;
+            x.noOfWards = x.lgas.reduce((a,b) => a += b.wards.length, 0);
+            x.noOfPollingUnit = 0;
+            x.noOfInecRegVoters = 0;
+            x.noOfFdVoters = 0;
+            return x;
+        });
+
+        console.log('States', states);
+        // fs.appendFile("./data/ward_and_local_governments_in_Nigeria_new.js", JSON.stringify(states), (err) => {
         //     if(err) return console.log(err);
         //     console.log("The file was saved!");
         // });
-        // Write to file
-        // wb.Strings.forEach(element => {
-        //     console.log(element);
-        //     fs.appendFile("./data/ward_and_local_governments_in_Nigeria3.json", element, (err) => {
-        //         if(err) return console.log(err);
-        //         console.log("The file was saved!");
-        //     });
-        // });
-        // res.send('Done');
-        // process.exit(1);
     }
 }
 function socketHandler(socket) {
