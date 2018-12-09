@@ -78,23 +78,36 @@ function httpHandler(req, res) {
             console.log("The file was saved!");
         });
     } else if (parsedUrl.href === '/add-extra-data') {
-        const file = require('./ward_and_local_governments_in_Nigeria.js');
+        const file = require('./ward_and_local_governments_in_Nigeria_new.js');
 
         console.log('File',file);
+
+        // Get statistics in relation to the state
         const states = file.map(x => {
-            x.noOfLga = x.lgas.length;
+            x.noOfLgas = x.lgas.length;
             x.noOfWards = x.lgas.reduce((a,b) => a += b.wards.length, 0);
-            x.noOfPollingUnit = 0;
+            x.noOfPollingUnits = 0;
             x.noOfInecRegVoters = 0;
             x.noOfFdVoters = 0;
             return x;
         });
-
         console.log('States', states);
-        // fs.appendFile("./data/ward_and_local_governments_in_Nigeria_new.js", JSON.stringify(states), (err) => {
-        //     if(err) return console.log(err);
-        //     console.log("The file was saved!");
-        // });
+
+        // Get statistics in relation to the country
+        const countryObj = {
+            name: 'Nigeria',
+            states: states,
+            noOfLgas: states.reduce((a,b) => a += b.noOfLgas, 0),
+            noOfWards: states.reduce((a,b) => a += b.noOfWards, 0),
+            noOfPollingUnits: states.reduce((a,b) => a += b.noOfPollingUnits, 0)
+        };
+
+        console.log('CountryObj', countryObj);
+
+        fs.appendFile("./data/ward_and_local_governments_in_nigeria_with_country_statistics.js", JSON.stringify(countryObj), (err) => {
+            if(err) return console.log(err);
+            console.log("The file was saved!");
+        });
     }
 }
 function socketHandler(socket) {
